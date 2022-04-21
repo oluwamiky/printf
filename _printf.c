@@ -1,48 +1,52 @@
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "main.h"
-
+#include <stddef.h>
 /**
- * _printf - my printf
- * @format: input constant
- * Return: size of bufer (success) or -1 if fail
+ * _printf - recreates the printf function
+ * @format: string with format specifier
+ * Return: number of characters printed
  */
-
 int _printf(const char *format, ...)
 {
 	if (format != NULL)
 	{
-		va_list argu;
-		unsigned int i;
+		int count = 0, i;
+		int (*m)(va_list);
+		va_list args;
 
-		char *buf, *temp_str;
-
-		va_start(argu, format);
-		buf = _calloc(2048, sizeof(char));
-
-		if (buf == NULL)
-			return (-1);
-
+		va_start(args, format);
 		i = 0;
-		while (format && format[i] != 00)
+		if (format[0] == '%' && format[1] == '\0')
+			return (-1);
+		while (format != NULL && format[i] != '\0')
 		{
-			if (format[0] == 37 && format[1] == 00)
+			if (format[i] == '%')
 			{
-				return (-1);
+				if (format[i + 1] == '%')
+				{
+					count += _putchar(format[i]);
+					i += 2;
+				}
+				else
+				{
+					m = get_func(format[i + 1]);
+					if (m)
+						count += m(args);
+					else
+						count = _putchar(format[i]) + _putchar(format[i + 1]);
+					i += 2;
+				}
 			}
-			i = _strncat(buf, format, i);
-			if (format[i] == 37)
+			else
 			{
+				count += _putchar(format[i]);
 				i++;
-				temp_str = fntn(format[i], argu);
-				_strcat(buf, temp_str);
 			}
-			if (format[i] != 00)
-				i++;
 		}
-		i = _strlen(buf);
-		write(1, buf, i);
-		va_end(argu);
-		free(buf);
-		return (i);
+		va_end(args);
+		return (count);
 	}
 	return (-1);
 }
