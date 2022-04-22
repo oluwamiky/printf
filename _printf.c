@@ -1,48 +1,42 @@
 #include "main.h"
 
+
 /**
- * _printf - produces output according to a format
- * @format: format string containing the characters and the specifiers
- * Description: this function will call the get_print() function that will
- * determine which printing function to call depending on the conversion
- * specifiers contained into fmt
- * Return: length of the formatted output string
+ * _putchar - writes the character c to stdout
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-int _printf(const char *format, ...)
+int _putchar(int c)
 {
-    int (*pfunc)(va_list, flags_t *);
-    const char *p;
-    va_list arguments;
-    flags_t flags = {0, 0, 0};
+	static char buf[1024];
+	static int pos;
 
-    register int count = 0;
-
-    va_start(arguments, format);
-    if (!format || (format[0] == '%' && !format[1]))
-        return (-1);
-    if (format[0] == '%' && format[1] == ' ' && !format[2])
-        return (-1);
-    for (p = format; *p; p++)
-    {
-        if (*p == '%')
-        {
-            p++;
-            if (*p == '%')
-            {
-                count += _putchar('%');
-                continue;
-            }
-            while (get_flag(*p, &flags))
-                p++;
-            pfunc = get_print(*p);
-            count += (pfunc)
-                         ? pfunc(arguments, &flags)
-                         : _printf("%%%c", *p);
-        }
-        else
-            count += _putchar(*p);
-    }
-    _putchar(-1);
-    va_end(arguments);
-    return (count);
+	if (c == -1 || pos >= 1024)
+	{
+		write(1, buf, pos);
+		pos = 0;
+	}
+	if (c != -1)
+	{
+		buf[pos++] = c;
+	}
+	return (1);
 }
+
+/**
+ * _puts - prints a string with newline
+ * @str: the string to print
+ *
+ * Return: number of characters printed
+ */
+int _puts(char *str)
+{
+	char *count = str;
+
+	while (*str)
+		_putchar(*str++);
+	return (str - count);
+}
+
